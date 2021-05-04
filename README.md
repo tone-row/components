@@ -2,7 +2,10 @@
 
 # @tone-row/components
 
-A 1.4kb library for creating styled, type-safe components in React apps.
+A smol library for creating styled, type-safe components in React apps.
+
+![npm version](https://img.shields.io/npm/v/@tone-row/components)
+![bundle size](https://img.shields.io/bundlephobia/minzip/@tone-row/components)
 
 ## Features
 
