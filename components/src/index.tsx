@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ComponentPropsWithRef, ElementType, ReactNode } from "react";
 
 const _components: Record<
   string,
@@ -16,24 +16,49 @@ export function prop<T>(args: Prop<T>): Prop<T> {
   return args;
 }
 
+type ComponentArgs<
+  K,
+  C extends ElementType = "div",
+  P extends boolean = true
+> = {
+  displayName: string;
+  defaultElement?: C;
+  polymorphic?: P;
+  props: K;
+};
+
 type FunctionArgs<K extends Record<string, Prop<any>>> = {
   [P in keyof K]?: K[P] extends Prop<infer U> ? U : never;
 };
 
-type ComponentArgs<K> = {
-  displayName: string;
-  baseClass: string;
-  props: K;
-};
+type PolymorphicArgs<
+  P extends boolean,
+  F extends React.ElementType = "div"
+> = P extends true ? { as?: F } : {};
 
-export function component<K extends Record<string, Prop<any>>>(
-  args: ComponentArgs<K>
-) {
-  _components[args.baseClass] = args.props;
-  const getComponentClassNameAndStyle = makeGetComponentClassNameAndStyle(args);
-  const separateComponentProps = makeSeparateComponentProps(args.props);
+export function component<
+  K extends Record<string, Prop<any>>,
+  C extends ElementType = "div",
+  P extends boolean = true
+>({ displayName, props, defaultElement, polymorphic }: ComponentArgs<K, C, P>) {
+  if (!displayName.match(/^[A-Z][a-zA-Z0-9]+$/)) {
+    throw new Error("Invalid displayName. Must match /^[A-Z][a-zA-Z0-9]+$/");
+  }
+  const baseClassName = displayName.toLocaleLowerCase();
+  _components[baseClassName] = props;
+  let element = defaultElement || "div";
+  const getComponentClassNameAndStyle = makeGetComponentClassNameAndStyle({
+    props,
+    baseClassName,
+  });
+  const separateComponentProps = makeSeparateComponentProps(props);
 
-  const Component = (props: FunctionArgs<K>) => {
+  const Component = <F extends ElementType = C>(
+    props: FunctionArgs<K> & {
+      children: ReactNode;
+    } & PolymorphicArgs<P, F> &
+      ComponentPropsWithRef<F>
+  ) => {
     const { componentProps, elementProps } = separateComponentProps(props);
     const { style, className } = getComponentClassNameAndStyle(componentProps);
     const {
@@ -41,17 +66,20 @@ export function component<K extends Record<string, Prop<any>>>(
       style: elementStyle = {},
       ...remainingProps
     } = elementProps;
+    let As = element;
+    if (polymorphic ?? true) {
+      As = props.as || element;
+    }
     return (
-      <div
+      <As
         className={[...className, elementClassName].filter(Boolean).join(" ")}
         style={{ ...style, ...(elementStyle as object) }} // this could trigger re-renders
         {...remainingProps}
-      >
-        Here we go again
-      </div>
+      />
     );
   };
-  Component.displayName = args.displayName;
+
+  Component.displayName = displayName;
   return Component;
 }
 
@@ -76,12 +104,12 @@ function makeSeparateComponentProps<K extends Record<string, Prop<any>>>(
 
 function makeGetComponentClassNameAndStyle<
   K extends Record<string, Prop<any>>
->({ baseClass, props: config }: ComponentArgs<K>) {
+>({ baseClassName, props: config }: { baseClassName: string; props: K }) {
   /**
    * Transforms props into the requisite classnames and css custom properties
    */
   return function getComponentClassNameAndStyle(props: FunctionArgs<K>) {
-    let className = [baseClass];
+    let className = [baseClassName];
     let style = {} as Record<string, string>;
 
     // Walk over config keys to determine what classes should be added based on props

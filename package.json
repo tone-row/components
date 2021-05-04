@@ -1,10 +1,12 @@
 {
   "private": true,
   "workspaces": [
-    "components"
+    "components",
+    "docs"
   ],
   "scripts": {
-    "commit": "cz"
+    "commit": "cz",
+    "dev": "concurrently -n 'components,docs' 'yarn workspace @tone-row/components dev' 'yarn workspace docs dev'"
   },
   "devDependencies": {
     "commitizen": "^4.2.3",

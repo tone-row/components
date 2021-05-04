@@ -23,7 +23,6 @@ const color = prop<"papayawhip" | "peachpuff">({
 
 export const Type = component({
   displayName: "Type",
-  baseClass: "type",
   props: {
     color,
   },
