@@ -1,6 +1,6 @@
 import Head from "next/head";
 import type { AppProps } from "next/app";
-import { css } from "@tone-row/components";
+import { css } from "../component/theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

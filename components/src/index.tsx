@@ -2,7 +2,7 @@ import React, { ComponentPropsWithRef, ElementType, ReactNode } from "react";
 
 const _components: Record<
   string,
-  ComponentArgs<Record<string, Prop<any>>>["props"]
+  ComponentArgs<Record<string, Prop<any>>, ElementType, boolean>
 > = {};
 
 export type Prop<T> = {
@@ -17,12 +17,15 @@ export function prop<T>(args: Prop<T>): Prop<T> {
 }
 
 type ComponentArgs<
-  K,
+  K extends Record<string, Prop<any>>,
   C extends ElementType = "div",
   P extends boolean = true
 > = {
   displayName: string;
   defaultElement?: C;
+  baseStyles?:
+    | Record<string, string>
+    | ((props: FunctionArgs<K>) => Record<string, string>);
   polymorphic?: P;
   props: K;
 };
@@ -33,19 +36,20 @@ type FunctionArgs<K extends Record<string, Prop<any>>> = {
 
 type PolymorphicArgs<
   P extends boolean,
-  F extends React.ElementType = "div"
+  F extends ElementType = "div"
 > = P extends true ? { as?: F } : {};
 
 export function component<
   K extends Record<string, Prop<any>>,
   C extends ElementType = "div",
   P extends boolean = true
->({ displayName, props, defaultElement, polymorphic }: ComponentArgs<K, C, P>) {
+>(args: ComponentArgs<K, C, P>) {
+  const { displayName, props, defaultElement, polymorphic } = args;
   if (!displayName.match(/^[A-Z][a-zA-Z0-9]+$/)) {
     throw new Error("Invalid displayName. Must match /^[A-Z][a-zA-Z0-9]+$/");
   }
   const baseClassName = displayName.toLocaleLowerCase();
-  _components[baseClassName] = props;
+  _components[baseClassName] = args;
   let element = defaultElement || "div";
   const getComponentClassNameAndStyle = makeGetComponentClassNameAndStyle({
     props,
@@ -160,18 +164,26 @@ export function css() {
   const lines: string[] = [];
   const atRules: Record<string, string[]> = {};
   for (const className in _components) {
-    const config = _components[className];
+    const { props: config, baseStyles = {} } = _components[className];
+
+    // Add base styles
+    if (typeof baseStyles === "function") {
+      lines.push(
+        createRuleset(`.${className}`, cssObjToStr(baseStyles(config)))
+      );
+    } else if (Object.keys(baseStyles)) {
+      lines.push(createRuleset(`.${className}`, cssObjToStr(baseStyles)));
+    }
+
     for (const prop in config) {
       const { toDeclaration, modifier = "", atRule = "" } = config[prop];
-      const styleStr = Object.entries(toDeclaration(`var(--${String(prop)})`))
-        .map(
-          ([k, v]) =>
-            `${k.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}:${v}`
-        )
-        .join(";");
-      const ruleset = `.${className}.${prop}${modifier} { ${styleStr} }`;
+
+      const ruleset = createRuleset(
+        `.${className}.${prop}${modifier}`,
+        cssObjToStr(toDeclaration(`var(--${String(prop)})`))
+      );
+
       // if they have an at rule, build the declaration but then store it in the atRules
-      // object reflecting that atRule
       if (atRule) {
         if (!(atRule in atRules)) atRules[atRule] = [];
         atRules[atRule].push(ruleset);
@@ -190,4 +202,17 @@ export function css() {
   }
 
   return lines.join("");
+}
+
+function cssObjToStr(cssObj: Record<string, string>) {
+  return Object.entries(cssObj)
+    .map(
+      ([k, v]) =>
+        `${k.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}:${v}`
+    )
+    .join(";");
+}
+
+function createRuleset(selectors: string, declarations: string) {
+  return `${selectors} { ${declarations} }`;
 }
