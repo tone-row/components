@@ -1,6 +1,6 @@
-<h1 style="text-align: center">@tone-row/components</h1>
+![@tone-row/components](/components.png)
 
-!(Components)[./components.png]
+# @tone-row/components
 
 A 1.4kb, component-focused library for creating styled, type-safe components in React apps. Intended to be used alongside css.
 
@@ -19,13 +19,6 @@ A 1.4kb, component-focused library for creating styled, type-safe components in 
 1. [Export `{ css }`](#export-css)
 1. [Include CSS](#include-css)
 1. [Use Components](#use-components)
-
-## Advanced Usage
-
-- [Modifiers](#modifiers) (psuedo states, attribute selectors)
-- [@rules](#responsive-props) (responsive breakpoints)
-- [Generate CSS](#generate-css)
-- [Theme File](#theme-file)
 
 ### Declare Props
 
@@ -143,6 +136,13 @@ export default function () {
 ```
 
 ---
+
+## Advanced Usage
+
+- [Modifiers](#modifiers) (psuedo states, attribute selectors)
+- [@rules](#responsive-props) (responsive breakpoints)
+- [Generate CSS](#generate-css)
+- [Theme File](#theme-file)
 
 ### Modifiers
 
