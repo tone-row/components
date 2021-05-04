@@ -13,7 +13,6 @@ export const Type = component({
 });
 
 /* Box */
-
 let toValue = (s: number | string) =>
   typeof s === "number" ? `calc(${s} * 10px)` : s;
 const p = prop<number | string>({
@@ -48,7 +47,6 @@ const gap = prop<number | string>({
   toValue,
   toDeclaration: (s) => ({ gridGap: s }),
 });
-
 const template = prop<string>({
   toDeclaration: (s) => ({ gridTemplate: s }),
 });
@@ -65,26 +63,28 @@ const flow = prop<"row" | "column">({
   toDeclaration: (v) => ({ gridAutoFlow: v }),
 });
 
+const boxProps = {
+  flow,
+  p,
+  py,
+  px,
+  pt,
+  pb,
+  pl,
+  pr,
+  gap,
+  template,
+  content,
+  items,
+  self,
+};
+
 export const Box = component({
   displayName: "Box",
   baseStyles: {
     display: "grid",
   },
-  props: {
-    flow,
-    p,
-    py,
-    px,
-    pt,
-    pb,
-    pl,
-    pr,
-    gap,
-    template,
-    content,
-    items,
-    self,
-  },
+  props: boxProps,
 });
 
 export { css } from "@tone-row/components";

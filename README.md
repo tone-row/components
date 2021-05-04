@@ -2,21 +2,22 @@
 
 # @tone-row/components
 
-A 1.4kb, component-focused library for creating styled, type-safe components in React apps. Intended to be used alongside css.
+A 1.4kb library for creating styled, type-safe components in React apps.
 
 ## Features
 
-- Component Driven
+- Component-first API
 - Type Safe
 - Minimal runtime using [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/--*)
 - [Polymorphic Components](https://www.benmvp.com/blog/polymorphic-react-components-typescript/)
-- Develop dynamically, generate static .css for deployment
+- Develop dynamically
+- Generate static `.css` file for deployment
 
 ## Basic Usage
 
 1. [Declare Props](#declare-props)
 1. [Build Components](#build-components)
-1. [Export `{ css }`](#export-css)
+1. [Export `{ css }`](#export-{-css-})
 1. [Include CSS](#include-css)
 1. [Use Components](#use-components)
 
@@ -59,21 +60,23 @@ export const Type = component({
 });
 ```
 
-### Export `css`
+### Export `{ css }`
 
-At the bottom of your [theme file](#theme-file) you must export the css function:
+Export the css function at the bottom of your [theme file](#theme-file).
 
 ```tsx
-// something like src/theme.ts or src/theme/index.ts
-
-// components components...
+// const color = ...
+// const fontSize = ...
+// export const Type = ...
 
 export { css } from "@tone-row/components";
 ```
 
 ### Include CSS
 
-`css` is a function that produces a CSS string. This makes it easy to use in a number of different environments. For instance, in [Next.js](https://nextjs.org/) we can use the `<Head>` component to get the benefit of being server-rendered.
+The `css` export is a function that produces a css string. This makes it easy to use in different environments.
+
+For example, in [Next.js](https://nextjs.org/) we can use the `<Head>` component to server-render our styles.
 
 ```tsx
 /* components/AppWrapper.tsx */
@@ -87,14 +90,13 @@ export default function AppWrapper({ children }) {
       <Head>
         <style dangerouslySetInnerHTML={{ __html: css() }} />
       </Head>
-
       {children}
     </>
   );
 }
 ```
 
-In environments without SSR we load styles on the client when the component mounts:
+In environments without SSR we can load styles on the client when the component mounts:
 
 ```tsx
 /* App.tsx */
@@ -115,7 +117,7 @@ export default function App() {
   // ...rest of component
 ```
 
-For a smaller runtime footprint, to benefit from browser-cacheing and reduce jank we recommend you [generate a css file](#generate-css).
+**Note** These techniques are great for development, but for a smaller runtime footprint, to benefit from browser-cacheing and reduce jank we recommend you [generate a static css file](#generate-css).
 
 ### Use Components
 
@@ -134,8 +136,6 @@ export default function () {
   );
 }
 ```
-
----
 
 ## Advanced Usage
 
