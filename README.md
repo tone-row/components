@@ -1,8 +1,10 @@
-# @tone-row/components
+<h1 style="text-align: center">@tone-row/components</h1>
+
+---
 
 Tiny API (1.2kb!) for creating styled, type-safe components. Focus more on **your theme** and less on _implementing your theme_ in css-material-styled-jsx-components-in-js.
 
-Build design-systems & theme apps faster 🤘
+Build design-systems faster 🤘
 
 ## Features
 
@@ -10,6 +12,7 @@ Build design-systems & theme apps faster 🤘
 - Type Safe
 - Minimal Runtime / Easily compiles to _.css_
 - Tiny API
+- Polymorphic
 
 ## Usage
 
@@ -45,3 +48,8 @@ export default function App() {
   );
 }
 ```
+
+Next Steps
+
+- see if you can type the css
+- add generate function to produce css file
