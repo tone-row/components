@@ -1,5 +1,3 @@
-![@tone-row/components](/components.png)
-
 # @tone-row/components
 
 A smol library for creating styled, type-safe components in React apps.
