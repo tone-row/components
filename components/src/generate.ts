@@ -33,9 +33,7 @@ function generateTheme() {
   console.log(`Generated ${style}`);
 }
 
-const watch = process.argv.slice(2)[1];
-
-if (watch === "-w") {
+if (process.argv.includes("--watch")) {
   generateTheme();
   console.log("Watching config for changes 👀");
   fs.watch(themeIndexPath, { encoding: "utf-8" }, () => {
