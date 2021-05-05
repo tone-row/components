@@ -147,11 +147,58 @@ export default function () {
 
 ### Modifiers
 
-[coming soon]
+Modifiers make it easy to create props that control psuedo-states (like `:hover`) or attribute selectors (like `[aria-selected]`).
+
+```tsx
+// theme.ts
+import { prop, modifier, component } from "@tone-row/components";
+
+type ThemeColors = "red" | "blue" | "green";
+
+const hover = modifier(":hover");
+
+const bg = prop<ThemeColors>({
+  toDeclaration: (v) => ({ backgroundColor: v }),
+});
+
+export const HoverableComponent = component({
+  displayName: "HoverableComponent",
+  props: {
+    bg,
+    bgHover: hover(bg),
+  },
+});
+```
+
+[View on CodeSandbox](https://codesandbox.io/s/modifier-example-yr2km?file=/src/theme.ts)
 
 ### Responsive Props
 
-[coming soon]
+The `atRule` function allows you to create props which are only declare in @rules, such as media queries.
+
+```tsx
+// theme.ts
+import { prop, atRule, component } from "@tone-row/components";
+
+const fontSize = prop<number>({
+  toDeclaration: (cssVar) => ({ fontSize: cssVar }),
+  toValue: (n) => `${n * 4}px`,
+});
+
+const desktop = atRule("@media (min-width: 600px)");
+
+export const Type = component({
+  displayName: "Type",
+  props: {
+    fontSize,
+    fontSizeDesktop: desktop(fontSize),
+  },
+});
+
+export { css } from "@tone-row/components";
+```
+
+[View on CodeSandbox](https://codesandbox.io/s/loving-lederberg-w274n?file=/src/theme.ts)
 
 ### Theme File
 
@@ -168,4 +215,16 @@ export { Modal } from "./Modal";
 
 ### Generate CSS
 
-[coming soon]
+Generate css using the `generate-css` script. The first argument must be a path to your [theme file](#theme-file). The second argument is optionally a path to the `css` file that will be generated. If not supplied, it will write directly to `./style.css`.
+
+Add the `--watch` flag to watch the theme file for changes.
+
+```json
+  // package.json...
+  "scripts": {
+    "theme": "generate-css theme/index.ts theme/style.css",
+    "theme:watch": "yarn theme --watch",
+    "dev": "concurrently -n 'app,theme' 'react-scripts start' 'yarn css:watch'"
+  },
+  // ...
+```
