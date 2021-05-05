@@ -19,23 +19,18 @@ export default [
         sourcemap: true,
       },
     ],
-    plugins: [
-      peerDepsExternal(),
-      resolve(),
-      commonjs(),
-      typescript(),
-    ],
+    plugins: [peerDepsExternal(), resolve(), commonjs(), typescript()],
   },
-  // {
-  //   input: "./src/generate.ts",
-  //   output: [
-  //     {
-  //       banner: "#!/usr/bin/env node",
-  //       file: packageJson.bin.slang,
-  //       format: "cjs",
-  //       sourcemap: true,
-  //     },
-  //   ],
-  //   plugins: [resolve(), typescript()],
-  // },
+  {
+    input: "./src/generate.ts",
+    output: [
+      {
+        banner: "#!/usr/bin/env node",
+        file: packageJson.bin["generate-css"],
+        format: "cjs",
+        sourcemap: true,
+      },
+    ],
+    plugins: [resolve(), typescript()],
+  },
 ];

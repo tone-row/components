@@ -8,8 +8,11 @@
     "url": "https://github.com/tone-row/components"
   },
   "bin": {
-    "css": "build/generate.js"
+    "generate-css": "build/generate.js"
   },
+  "files": [
+    "build"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
@@ -32,7 +35,11 @@
   },
   "release": {
     "branches": [
-      "main"
+      "main",
+      {
+        "name": "experimental",
+        "prerelease": true
+      }
     ]
   },
   "dependencies": {

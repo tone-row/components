@@ -19,4 +19,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn workspace @tone-row/components semantic-release
+        run: cp README.md components/ && yarn workspace @tone-row/components semantic-release
