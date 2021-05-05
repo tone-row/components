@@ -10,6 +10,9 @@
   "bin": {
     "generate-css": "build/generate.js"
   },
+  "files": [
+    "build"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
