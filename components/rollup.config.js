@@ -32,6 +32,6 @@ export default [
         sourcemap: true,
       },
     ],
-    plugins: [json(), resolve({ preferBuiltins: true }), typescript()],
+    plugins: [resolve({ preferBuiltins: true }), typescript(), json()],
   },
 ];

@@ -3,7 +3,7 @@
   "version": "0.0.0-development",
   "main": "build/index.js",
   "module": "build/index.es.js",
-  "types": "build/index.d.ts",
+  "types": "build/src/index.d.ts",
   "repository": {
     "url": "https://github.com/tone-row/components"
   },
