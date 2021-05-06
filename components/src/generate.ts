@@ -1,6 +1,26 @@
 import fs from "fs";
 import path from "path";
 import { RegisterOptions } from "ts-node";
+import yargs from "yargs";
+import pkg from "../package.json";
+const chokidar = require("chokidar");
+
+const argv = yargs(process.argv.slice(2))
+  .version(pkg.version)
+  .usage("Usage: $0 --input [filepath] --output [filepath] --watch [filepath]")
+  .alias("input", "i")
+  .describe("input", "Path to theme entrypoint, example 'src/theme.ts'")
+  .alias("output", "o")
+  .describe("output", "Path to generate stylesheet, example 'src/style.css'")
+  .alias("watch", "w")
+  .describe("watch", "Path to file or folder to watch for changes")
+  .demandOption(["input", "output"]).argv;
+
+let { input, output, watch } = argv as {
+  input: string;
+  output: string;
+  watch?: string;
+};
 
 const tsNodeRegisterOptions: RegisterOptions = {
   transpileOnly: true,
@@ -12,37 +32,36 @@ const tsNodeRegisterOptions: RegisterOptions = {
 
 require("ts-node").register(tsNodeRegisterOptions);
 
-const themeIndex = process.argv[2];
-const style = process.argv[3] ?? "./style.css";
-if (!themeIndex)
-  throw new Error("Argument 0 should be the path to the root of your theme");
+input = path.resolve(process.cwd(), input);
+output = path.resolve(process.cwd(), output);
+watch = watch ? path.resolve(process.cwd(), watch) : watch;
 
-const themeIndexPath = path.resolve(process.cwd(), themeIndex);
-
-function generateTheme() {
+function generate() {
   // required to get new versions when watching
-  delete require.cache[require.resolve(themeIndexPath)];
-  const { css } = require(themeIndexPath);
+  delete require.cache[require.resolve(input)];
+
+  const { css } = require(input);
+
   if (!css)
     throw new Error(
-      `css export missing from ${themeIndex}\n\nMake sure to add:\n\nexport { css } from "@tone-row/components";\n\nat the end of your file`
+      `css export missing from ${input}\n\nMake sure to add:\n\nexport { css } from "@tone-row/components";\n\nat the end of your file`
     );
 
-  const stylePath = path.resolve(process.cwd(), style);
-  fs.writeFileSync(stylePath, css(), "utf-8");
-  console.log(`Generated ${style}`);
+  fs.writeFileSync(output, css(), "utf-8");
+  console.log(`Generated ${output}`);
 }
 
-if (process.argv.includes("--watch")) {
-  generateTheme();
-  console.log("Watching config for changes 👀");
-  fs.watch(themeIndexPath, { encoding: "utf-8" }, () => {
-    try {
-      generateTheme();
-    } catch (e) {
-      console.error(e);
-    }
+if (watch) {
+  const watcher = chokidar.watch(watch, {
+    ignored: /\.css/,
+    persistent: true,
+    usePolling: true,
+  });
+  watcher.on("change", generate);
+  watcher.on("ready", () => {
+    generate();
+    console.log("Watching for changes 👀");
   });
 } else {
-  generateTheme();
+  generate();
 }
