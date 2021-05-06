@@ -36,10 +36,13 @@ input = path.resolve(process.cwd(), input);
 output = path.resolve(process.cwd(), output);
 watch = watch ? path.resolve(process.cwd(), watch) : watch;
 
-function generate() {
+function generate(changedFile?: string) {
   // required to get new versions when watching
   delete require.cache[require.resolve(input)];
-
+  if (changedFile) {
+    console.log(`Deleting cache for ${changedFile}`);
+    delete require.cache[require.resolve(changedFile)];
+  }
   const { css } = require(input);
 
   if (!css)
@@ -57,7 +60,9 @@ if (watch) {
     persistent: true,
     usePolling: true,
   });
-  watcher.on("change", generate);
+  watcher.on("change", (changedFile: string) => {
+    generate(changedFile);
+  });
   watcher.on("ready", () => {
     generate();
     console.log("Watching for changes 👀");
