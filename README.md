@@ -215,15 +215,15 @@ export { Modal } from "./Modal";
 
 ### Generate CSS
 
-Generate css using the `generate-css` script. The first argument must be a path to your [theme file](#theme-file). The second argument is optionally a path to the `css` file that will be generated. If not supplied, it will write directly to `./style.css`.
+Generate css using the `generate-css` command
 
-Add the `--watch` flag to watch the theme file for changes.
+Pass a file, folder or glob to the `--watch` flag to watch the theme file for changes.
 
 ```json
   // package.json...
   "scripts": {
-    "theme": "generate-css theme/index.ts theme/style.css",
-    "theme:watch": "yarn theme --watch",
+    "css": "generate-css --input theme/index.ts --output theme/style.css",
+    "theme:watch": "yarn css --watch theme",
     "dev": "concurrently -n 'app,theme' 'react-scripts start' 'yarn css:watch'"
   },
   // ...
