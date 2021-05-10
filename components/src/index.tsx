@@ -1,4 +1,10 @@
-import React, { ComponentPropsWithRef, ElementType, ReactNode } from "react";
+import React, {
+  ComponentPropsWithRef,
+  ElementType,
+  ForwardedRef,
+  forwardRef,
+  ReactNode,
+} from "react";
 
 const _components: Record<
   string,
@@ -57,31 +63,37 @@ export function component<
   });
   const separateComponentProps = makeSeparateComponentProps(props);
 
-  const Component = <F extends ElementType = C>(
-    props: FunctionArgs<K> & {
-      children: ReactNode;
-    } & PolymorphicArgs<P, F> &
-      ComponentPropsWithRef<F>
-  ) => {
-    const { componentProps, elementProps } = separateComponentProps(props);
-    const { style, className } = getComponentClassNameAndStyle(componentProps);
-    const {
-      className: elementClassName = "",
-      style: elementStyle = {},
-      ...remainingProps
-    } = elementProps;
-    let As = element;
-    if (polymorphic ?? true) {
-      As = props.as || element;
+  const Component = forwardRef(
+    <F extends ElementType = C>(
+      props: FunctionArgs<K> & {
+        children: ReactNode;
+      } & PolymorphicArgs<P, F> &
+        ComponentPropsWithRef<F>,
+      ref: ForwardedRef<F>
+    ) => {
+      const { componentProps, elementProps } = separateComponentProps(props);
+      const { style, className } = getComponentClassNameAndStyle(
+        componentProps
+      );
+      const {
+        className: elementClassName = "",
+        style: elementStyle = {},
+        ...remainingProps
+      } = elementProps;
+      let As = element;
+      if (polymorphic ?? true) {
+        As = props.as || element;
+      }
+      return (
+        <As
+          ref={ref}
+          className={[...className, elementClassName].filter(Boolean).join(" ")}
+          style={{ ...style, ...(elementStyle as object) }}
+          {...remainingProps}
+        />
+      );
     }
-    return (
-      <As
-        className={[...className, elementClassName].filter(Boolean).join(" ")}
-        style={{ ...style, ...(elementStyle as object) }} // this could trigger re-renders
-        {...remainingProps}
-      />
-    );
-  };
+  );
 
   Component.displayName = displayName;
   return Component;
