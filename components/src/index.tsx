@@ -40,10 +40,8 @@ type FunctionArgs<K extends Record<string, Prop<any>>> = {
   [P in keyof K]?: K[P] extends Prop<infer U> ? U : never;
 };
 
-type PolymorphicArgs<
-  P extends boolean,
-  F extends ElementType = "div"
-> = P extends true ? { as?: F } : {};
+type PolymorphicArgs<P extends boolean, F extends ElementType = "div"> =
+  P extends true ? { as?: F } : {};
 
 export function component<
   K extends Record<string, Prop<any>>,
@@ -72,9 +70,8 @@ export function component<
       ref: ForwardedRef<F>
     ) => {
       const { componentProps, elementProps } = separateComponentProps(props);
-      const { style, className } = getComponentClassNameAndStyle(
-        componentProps
-      );
+      const { style, className } =
+        getComponentClassNameAndStyle(componentProps);
       const {
         className: elementClassName = "",
         style: elementStyle = {},
@@ -93,7 +90,15 @@ export function component<
         />
       );
     }
-  );
+  ) as {
+    <F extends React.ElementType<any> = C>(
+      props: FunctionArgs<K> & {
+        children: ReactNode;
+      } & PolymorphicArgs<P, F> &
+        React.ComponentPropsWithRef<F>
+    ): JSX.Element;
+    displayName: string;
+  };
 
   Component.displayName = displayName;
   return Component;
