@@ -13,7 +13,7 @@ const _components: Record<
 
 export type Prop<T> = {
   toDeclaration: (variable: string) => Record<string, string>;
-  toValue?: (propValue: T) => string | void;
+  toValue?: (propValue: T) => string | Record<string, string> | void;
   modifier?: string;
   atRule?: string;
 };
@@ -159,7 +159,13 @@ function getPropClassNameAndStyle<
   if (typeof value !== "undefined") {
     const keyString = String(key);
     classNames.push(keyString);
-    customProperties[`--${keyString}`] = String(value);
+    if (typeof value === "object") {
+      for (const suffix in value as Record<string, string>) {
+        customProperties[`--${keyString}-${suffix}`] = String(value[suffix]);
+      }
+    } else {
+      customProperties[`--${keyString}`] = String(value);
+    }
   }
 
   return { classNames, customProperties };
